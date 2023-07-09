@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ASP.NetCoreConsoleAppPractice.Examples;
+using System;
 
 namespace ASP.NetCoreConsoleAppPractice
 {
@@ -6,7 +7,7 @@ namespace ASP.NetCoreConsoleAppPractice
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            ADONetExample.Run();
         }
     }
 }
