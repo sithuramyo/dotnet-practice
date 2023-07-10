@@ -8,6 +8,8 @@ namespace ASP.NetCoreConsoleAppPractice
         static void Main(string[] args)
         {
             ADONetExample.Run();
+            //Console.Write("Press any key to continue...");
+            //Console.ReadKey();
         }
     }
 }
