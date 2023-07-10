@@ -4,9 +4,7 @@ using ASP.NetCoreConsoleAppPractice.Services;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using System.Threading;
 
 namespace ASP.NetCoreConsoleAppPractice.Examples
 {
@@ -26,7 +24,7 @@ namespace ASP.NetCoreConsoleAppPractice.Examples
             Console.WriteLine("3: Show Details");
             Console.WriteLine("4: Exit");
             string option = Console.ReadLine();
-            if (option == "1")
+            if(option == "1")
             {
                 Console.WriteLine("1: Add New Car Type");
                 Console.WriteLine("2: Edit Car Type");
@@ -104,155 +102,73 @@ namespace ASP.NetCoreConsoleAppPractice.Examples
                     goto selectAll;
                 }
             }
-            else if (option == "2")
+            else if(option == "2")
             {
-            backto:
-                Console.WriteLine("1: Add Car Type Details");
-                Console.WriteLine("2: Edit Car Type Details");
-                Console.WriteLine("3: Delete Car Type Details");
-                Console.WriteLine("4: Return");
-                string carDetailsOption = Console.ReadLine();
-                if (carDetailsOption == "1")
+                Console.WriteLine("Enter Id To Choose Car Type For Making Details");
+                string chooseCarType = Console.ReadLine();
+                try
                 {
-                    Console.WriteLine("Enter Id To Choose Car Type For Making Details");
-                    string chooseCarType = Console.ReadLine();
-                    DataTable isDuplicateDetails = aDONetService.Query($"SELECT COUNT(*) FROM tbl_car_details WHERE car_type_id = '{chooseCarType}'");
-                    int isDuplicated = Convert.ToInt32(isDuplicateDetails.Rows[0][0]);
-                    if (isDuplicated > 0)
+                    DataTable dtGetById = aDONetService.Query($"SELECT * FROM tbl_car_type with (nolock) WHERE id = '{chooseCarType}'"); 
+                    foreach(DataRow dataRow in dtGetById.Rows)
                     {
-                        Console.WriteLine("!!!!!!!!Data is already Added!!!!!!!!");
-                        goto backto;
-                    }
-                    else
-                    {
-
-                        try
-                        {
-                            DataTable dtGetById = aDONetService.Query($"SELECT * FROM tbl_car_type with (nolock) WHERE id = '{chooseCarType}'");
-                            foreach (DataRow dataRow in dtGetById.Rows)
-                            {
-                                CarTypeDataModel carType = new CarTypeDataModel();
-                                carType.id = (long)dataRow["id"];
-                                carType.car_type = (string)dataRow["car_type"];
-                                Console.WriteLine("Car Type is  :" + carType.car_type);
-                                Console.Write("Add Car Brand   :");
-                                string carbrand = Console.ReadLine();
-                                Console.Write("Add Car Name    :");
-                                string carname = Console.ReadLine();
-                                Console.Write("Add Car Details :");
-                                string cardetails = Console.ReadLine();
-                                string QueryInsertDetails = $"INSERT INTO tbl_car_details VALUES('{carbrand}','{carname}','{cardetails}','{carType.id}')";
-                                int resultInsertDetails = aDONetService.Excute(QueryInsertDetails);
-                                Console.WriteLine(resultInsertDetails > 0 ? "Adding Car Type Details Successful" : "Adding Car Type Details Fail");
-                                goto selectAll;
-                            }
-
-                        }
-                        catch (Exception e)
-                        {
-                            throw new Exception(e.Message);
-                        }
-                    }
-                }
-                else if (carDetailsOption == "2")
-                {
-                    Console.WriteLine("Enter Id to Edit Car Details");
-                    try
-                    {
-                        string carDetailId = Console.ReadLine();
-                        DataTable dtGetById = aDONetService.Query($"SELECT * FROM tbl_car_details with (nolock) WHERE car_type_id = '{carDetailId}'");
-                        dtGetById.ToLog();
-                        Console.Write("Enter Car Brand to Edit Car Details   :");
+                        CarTypeDataModel carType = new CarTypeDataModel();
+                        carType.id = (long)dataRow["id"];
+                        carType.car_type = (string)dataRow["car_type"];
+                        Console.WriteLine("Car Type is  :"+carType.car_type);
+                        Console.Write("Add Car Brand   :");
                         string carbrand = Console.ReadLine();
-                        Console.Write("Enter Car Name to Edit Car Details    :");
+                        Console.Write("Add Car Name    :");
                         string carname = Console.ReadLine();
-                        Console.Write("Enter Car Details to Edit Car Details :");
+                        Console.Write("Add Car Details :");
                         string cardetails = Console.ReadLine();
-                        string QueryUpdateDetails = $"UPDATE tbl_car_details SET car_brand = '{carbrand}',car_name = '{carname}',car_details='{cardetails}' WHERE car_type_id = '{carDetailId}'";
-                        int resultUpdate = aDONetService.Excute(QueryUpdateDetails);
-                        Console.WriteLine(resultUpdate > 0 ? "Updating Car Type Details Successful" : "Updating Car Type Details Fail");
-                        goto selectAll;
+                        string QueryInsertDetails = $"INSERT INTO tbl_car_details VALUES('{carbrand}','{carname}','{cardetails}','{carType.id}')";
+                        int resultInsertDetails = aDONetService.Excute(QueryInsertDetails);
+                        Console.WriteLine(resultInsertDetails > 0 ? "Adding Car Type Details Successful" : "Adding Car Type Details Fail");
                     }
-                    catch (Exception e)
-                    {
-                        throw new Exception(e.Message);
-                    }
-
+                    
                 }
-                else if (carDetailsOption == "3")
+                catch(Exception e)
                 {
-                    Console.WriteLine("Enter Id to Delete Car Details");
-                    string deleteIdDetails = Console.ReadLine();
-                    Console.Write("Are you sure want to Delete this? Press 1 one to Delete  :");
-                    string deleteConfirm = Console.ReadLine();
-                    if (deleteConfirm == "1")
-                    {
-                        try
-                        {
-                            string QueryDelete = $"DELETE FROM tbl_car_details WHERE car_type_id = '{deleteIdDetails}'";
-                            int resultDelete = aDONetService.Excute(QueryDelete);
-                            Console.WriteLine(resultDelete > 0 ? "Delete Car Type Details Successful" : "Delete Car Type Details Fail");
-                            goto selectAll;
-                        }
-                        catch (Exception e)
-                        {
-                            throw new Exception(e.Message);
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Wrong Input");
-                        goto backto;
-                    }
-
-                }
-                else if (carDetailsOption == "4")
-                {
-                    goto selectAll;
-                }
-                else
-                {
-                    Console.WriteLine("Wrong input");
-                    return;
+                    throw new Exception (e.Message);
                 }
             }
-            else if (option == "3")
+            else if(option == "3")
             {
-                Console.WriteLine("Enter Id to Show Details");
-                string ShowId = Console.ReadLine();
+               Console.WriteLine("Enter Id to Show Details");
+               string ShowId = Console.ReadLine() ;
                 try
                 {
                     DataTable dtGetById = aDONetService.Query($"SELECT * FROM tbl_car_type with (nolock) WHERE id = '{ShowId}'");
-                    foreach (DataRow dataRow in dtGetById.Rows)
+                    foreach(DataRow dataRow in dtGetById.Rows)
                     {
                         CarTypeDataModel CarType = new CarTypeDataModel();
                         CarType.id = (long)dataRow["id"];
                         CarType.car_type = (string)dataRow["car_type"];
                         Console.WriteLine(">>>>>>>Car Details is<<<<<<<");
-                        Console.WriteLine("Car Type is    :" + CarType.car_type);
+                        Console.WriteLine("Car Type is    :"+CarType.car_type);
                         string SelectQuery = $"SELECT * FROM tbl_car_details with (nolock) WHERE car_type_id = '{CarType.id}'";
                         DataTable carDetails = aDONetService.Query(SelectQuery);
-                        foreach (DataRow dataRow1 in carDetails.Rows)
+                        foreach(DataRow dataRow1 in carDetails.Rows)
                         {
                             CarDetailsViewModel carDetailsView = new CarDetailsViewModel();
                             carDetailsView.id = (long)dataRow1["id"];
                             carDetailsView.car_brand = (string)dataRow1["car_brand"];
                             carDetailsView.car_name = (string)dataRow1["car_name"];
                             carDetailsView.car_details = (string)dataRow1["car_details"];
-                            Console.WriteLine("Car Brand is   :" + carDetailsView.car_brand);
-                            Console.WriteLine("Car Name is    :" + carDetailsView.car_name);
-                            Console.WriteLine("Car Details is :" + carDetailsView.car_details);
+                            Console.WriteLine("Car Brand is   :"+carDetailsView.car_brand);
+                            Console.WriteLine("Car Name is    :"+carDetailsView.car_name);
+                            Console.WriteLine("Car Details is :"+carDetailsView.car_details);
                             goto selectAll;
 
                         }
                     }
                 }
-                catch (Exception e)
+                catch(Exception e)
                 {
                     throw new Exception(e.Message);
                 }
             }
-            else if (option == "4")
+            else if(option == "4")
             {
                 return;
             }
