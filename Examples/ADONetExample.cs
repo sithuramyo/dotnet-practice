@@ -40,39 +40,9 @@ namespace ASP.NetCoreConsoleAppPractice.Examples
             }
             else if (option == "3")
             {
-                Console.WriteLine("Enter Id to Show Details");
-                string ShowId = Console.ReadLine();
-                try
-                {
-                    DataTable dtGetById = aDONetService.Query($"SELECT * FROM tbl_car_type with (nolock) WHERE id = '{ShowId}'");
-                    foreach (DataRow dataRow in dtGetById.Rows)
-                    {
-                        CarTypeDataModel CarType = new CarTypeDataModel();
-                        CarType.id = (long)dataRow["id"];
-                        CarType.car_type = (string)dataRow["car_type"];
-                        Console.WriteLine(">>>>>>>Car Details is<<<<<<<");
-                        Console.WriteLine("Car Type is    :" + CarType.car_type);
-                        string SelectQuery = $"SELECT * FROM tbl_car_details with (nolock) WHERE car_type_id = '{CarType.id}'";
-                        DataTable carDetails = aDONetService.Query(SelectQuery);
-                        foreach (DataRow dataRow1 in carDetails.Rows)
-                        {
-                            CarDetailsViewModel carDetailsView = new CarDetailsViewModel();
-                            carDetailsView.id = (long)dataRow1["id"];
-                            carDetailsView.car_brand = (string)dataRow1["car_brand"];
-                            carDetailsView.car_name = (string)dataRow1["car_name"];
-                            carDetailsView.car_details = (string)dataRow1["car_details"];
-                            Console.WriteLine("Car Brand is   :" + carDetailsView.car_brand);
-                            Console.WriteLine("Car Name is    :" + carDetailsView.car_name);
-                            Console.WriteLine("Car Details is :" + carDetailsView.car_details);
-                            goto selectAll;
-
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw new Exception(e.Message);
-                }
+                EnumState state = Case3();
+                if(state == EnumState.SelectAll)
+                    goto selectAll;
             }
             else if (option == "4")
             {
@@ -275,6 +245,45 @@ namespace ASP.NetCoreConsoleAppPractice.Examples
                 Console.WriteLine("Wrong input");
                 return EnumState.SelectAll;
             }
+            return EnumState.SelectAll;
+        }
+
+        private static EnumState Case3()
+        {
+            Console.WriteLine("Enter Id to Show Details");
+            string ShowId = Console.ReadLine();
+            try
+            {
+                DataTable dtGetById = aDONetService.Query($"SELECT * FROM tbl_car_type with (nolock) WHERE id = '{ShowId}'");
+                foreach (DataRow dataRow in dtGetById.Rows)
+                {
+                    CarTypeDataModel CarType = new CarTypeDataModel();
+                    CarType.id = (long)dataRow["id"];
+                    CarType.car_type = (string)dataRow["car_type"];
+                    Console.WriteLine(">>>>>>>Car Details is<<<<<<<");
+                    Console.WriteLine("Car Type is    :" + CarType.car_type);
+                    string SelectQuery = $"SELECT * FROM tbl_car_details with (nolock) WHERE car_type_id = '{CarType.id}'";
+                    DataTable carDetails = aDONetService.Query(SelectQuery);
+                    foreach (DataRow dataRow1 in carDetails.Rows)
+                    {
+                        CarDetailsViewModel carDetailsView = new CarDetailsViewModel();
+                        carDetailsView.id = (long)dataRow1["id"];
+                        carDetailsView.car_brand = (string)dataRow1["car_brand"];
+                        carDetailsView.car_name = (string)dataRow1["car_name"];
+                        carDetailsView.car_details = (string)dataRow1["car_details"];
+                        Console.WriteLine("Car Brand is   :" + carDetailsView.car_brand);
+                        Console.WriteLine("Car Name is    :" + carDetailsView.car_name);
+                        Console.WriteLine("Car Details is :" + carDetailsView.car_details);
+                        return EnumState.SelectAll;
+
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            return EnumState.SelectAll;
         }
 
         public enum EnumState
