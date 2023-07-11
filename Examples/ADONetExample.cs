@@ -254,29 +254,39 @@ namespace ASP.NetCoreConsoleAppPractice.Examples
             string ShowId = Console.ReadLine();
             try
             {
-                DataTable dtGetById = aDONetService.Query($"SELECT * FROM tbl_car_type with (nolock) WHERE id = '{ShowId}'");
-                foreach (DataRow dataRow in dtGetById.Rows)
-                {
-                    CarTypeDataModel CarType = new CarTypeDataModel();
-                    CarType.id = (long)dataRow["id"];
-                    CarType.car_type = (string)dataRow["car_type"];
-                    Console.WriteLine(">>>>>>>Car Details is<<<<<<<");
-                    Console.WriteLine("Car Type is    :" + CarType.car_type);
-                    string SelectQuery = $"SELECT * FROM tbl_car_details with (nolock) WHERE car_type_id = '{CarType.id}'";
-                    DataTable carDetails = aDONetService.Query(SelectQuery);
-                    foreach (DataRow dataRow1 in carDetails.Rows)
+                DataTable isHave = aDONetService.Query($"SELECT COUNT(*) FROM tbl_car_details WHERE car_type_id = '{ShowId}'");              
+                int isHaveData = Convert.ToInt32(isHave.Rows[0][0]);
+                Console.WriteLine("is Have Data " + isHaveData);
+                if (isHaveData > 0)
+                {             
+                    DataTable dtGetById = aDONetService.Query($"SELECT * FROM tbl_car_type with (nolock) WHERE id = '{ShowId}'");
+                    foreach (DataRow dataRow in dtGetById.Rows)
                     {
-                        CarDetailsViewModel carDetailsView = new CarDetailsViewModel();
-                        carDetailsView.id = (long)dataRow1["id"];
-                        carDetailsView.car_brand = (string)dataRow1["car_brand"];
-                        carDetailsView.car_name = (string)dataRow1["car_name"];
-                        carDetailsView.car_details = (string)dataRow1["car_details"];
-                        Console.WriteLine("Car Brand is   :" + carDetailsView.car_brand);
-                        Console.WriteLine("Car Name is    :" + carDetailsView.car_name);
-                        Console.WriteLine("Car Details is :" + carDetailsView.car_details);
-                        return EnumState.SelectAll;
-
+                        CarTypeDataModel CarType = new CarTypeDataModel();
+                        CarType.id = (long)dataRow["id"];
+                        CarType.car_type = (string)dataRow["car_type"];
+                        Console.WriteLine(">>>>>>>Car Details is<<<<<<<");
+                        Console.WriteLine("Car Type is    :" + CarType.car_type);
+                        string SelectQuery = $"SELECT * FROM tbl_car_details with (nolock) WHERE car_type_id = '{CarType.id}'";
+                        DataTable carDetails = aDONetService.Query(SelectQuery);
+                        foreach (DataRow dataRow1 in carDetails.Rows)
+                        {
+                            CarDetailsViewModel carDetailsView = new CarDetailsViewModel();
+                            carDetailsView.id = (long)dataRow1["id"];
+                            carDetailsView.car_brand = (string)dataRow1["car_brand"];
+                            carDetailsView.car_name = (string)dataRow1["car_name"];
+                            carDetailsView.car_details = (string)dataRow1["car_details"];
+                            Console.WriteLine("Car Brand is   :" + carDetailsView.car_brand);
+                            Console.WriteLine("Car Name is    :" + carDetailsView.car_name);
+                            Console.WriteLine("Car Details is :" + carDetailsView.car_details);
+                            return EnumState.SelectAll;
+                        }
                     }
+                }
+                else
+                {
+                    Console.WriteLine("Details data not have!!!!");
+                    return EnumState.SelectAll;
                 }
             }
             catch (Exception e)
